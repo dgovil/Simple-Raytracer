@@ -12,14 +12,12 @@
 
 int main()
 {
-	int width = 640;
-	int height = 480;
+	int width = 1920;
+	int height = 1080;
 
-	std::ofstream ppm;
-	ppm.open("test.ppm");
-	std::vector<int> image;
 
-	ppm << "P3\n" << width << " " << height << "\n255\n";
+	std::vector<uint8_t> image;
+
 
 	for (int row = 0; row < height; row++)
 	{
@@ -30,22 +28,19 @@ int main()
 			float g = float(height - row) / float(height);
 			float b = 0.2;
 
-			int ir = int(255.99 * r);
-			int ig = int(255.99 * g);
-			int ib = int(255.99 * b);
-
+			uint8_t ir = static_cast<uint8_t>(255.99 * r);
+			uint8_t ig = static_cast<uint8_t>(255.99 * g);
+			uint8_t ib = static_cast<uint8_t>(255.99 * b);
 			image.push_back(ir);
 			image.push_back(ig);
 			image.push_back(ib);
 
 
-			ppm << ir << " " << ig << " " << ib << "\n";
 			
 		}
 	}
 
 	stbi_write_jpg("test.jpg", width, height, 3, image.data(), 100);
-	ppm.close();
 
 	return 0;
 }

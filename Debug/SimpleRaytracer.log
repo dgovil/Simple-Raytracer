@@ -1,3 +1,4 @@
 ﻿  SimpleRaytracer.cpp
+e:\projects\simpleraytracer\simpleraytracer\simpleraytracer.cpp(29): warning C4305: 'initializing': truncation from 'double' to 'float'
   SimpleRaytracer.vcxproj -> E:\Projects\SimpleRaytracer\Debug\SimpleRaytracer.exe
   SimpleRaytracer.vcxproj -> E:\Projects\SimpleRaytracer\Debug\SimpleRaytracer.pdb (Partial PDB)
