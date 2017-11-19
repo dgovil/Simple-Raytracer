@@ -3,10 +3,10 @@
 
 camera::camera()
 {
-	lower_left_corner = vec3(-2.0f, -1.0f, -1.0f);
-	horizontal = vec3(4.0f, 0.0f, 0.0f);
-	vertical = vec3(0.0f, 2.0f, 0.0f);
-	origin = vec3(0.0f, 0.0f, 0.0f);
+	lower_left_corner = vec3(-2.0, -1.0, -1.0);
+	horizontal = vec3(4.0, 0.0, 0.0);
+	vertical = vec3(0.0, 2.0, 0.0);
+	origin = vec3(0.0, 0.0, 0.0);
 }
 
 ray camera::get_ray(float u, float v)
