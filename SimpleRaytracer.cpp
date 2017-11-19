@@ -16,20 +16,6 @@
 #include "float.h"
 #include "camera.h"
 
-
-vec3 color(const ray& r, hitable *world)
-{
-	hit_record rec;
-	if (world->hit(r, 0.0, FLT_MAX, rec))
-	{
-		return 0.5*vec3(rec.normal.x() + 1, rec.normal.y() + 1, rec.normal.z() + 1);
-	}
-
-	vec3 unit_direction = unit_vector(r.direction());
-	float t = 0.5f*(unit_direction.y() + 1.0f);
-	return (1.0f - t)*vec3(1.0f, 1.0f, 1.0f) + t*vec3(0.5f, 0.7f, 1.0f);
-}
-
 #ifdef _WIN32
 float drand48()
 {
@@ -38,10 +24,35 @@ float drand48()
 #endif
 
 
+vec3 random_in_unit_sphere()
+{
+	vec3 p;
+	do
+	{
+		p = 2.0f*vec3(drand48(), drand48(), drand48()) - vec3(1, 1, 1);
+	} while (p.squared_length() >= 1.0f);
+	return p;
+}
+
+vec3 color(const ray& r, hitable *world)
+{
+	hit_record rec;
+	if (world->hit(r, 0.001, FLT_MAX, rec))
+	{
+		const vec3 target = rec.p + rec.normal + random_in_unit_sphere();
+		return 0.5*color(ray(rec.p, target-rec.p), world);
+	}
+
+	vec3 unit_direction = unit_vector(r.direction());
+	float t = 0.5f*(unit_direction.y() + 1.0f);
+	return (1.0f - t)*vec3(1.0f, 1.0f, 1.0f) + t*vec3(0.5f, 0.7f, 1.0f);
+}
+
+
 int main()
 {
-	int width = 200;
-	int height = 100;
+	int width = 400;
+	int height = 200;
 	int samples = 32;
 
 
@@ -68,6 +79,13 @@ int main()
 			}
 
 			col /= float(samples);
+
+			// Gamma correct
+			col = vec3(
+				sqrt(col[0]),
+				sqrt(col[1]),
+				sqrt(col[2])
+			);
 			
 
 			uint8_t ir = static_cast<uint8_t>(255.99f * col.r());
@@ -75,13 +93,9 @@ int main()
 			uint8_t ib = static_cast<uint8_t>(255.99f * col.b());
 			image.push_back(ir);
 			image.push_back(ig);
-			image.push_back(ib);
-
-
-			
+			image.push_back(ib);		
 		}
 	}
-
 	stbi_write_jpg("test.jpg", width, height, 3, image.data(), 100);
 
 	return 0;
