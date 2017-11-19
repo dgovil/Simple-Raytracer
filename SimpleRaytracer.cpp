@@ -10,23 +10,20 @@
 #include "vec3.h"
 #include <fstream>
 #include "ray.h"
+#include "hitable.h"
+#include "sphere.h"
+#include "hitable_list.h"
+#include "float.h"
 
-bool hit_sphere(const vec3& center, float radius, const ray& r)
-{
-	vec3 oc = r.origin() - center;
-	float a = dot(r.direction(), r.direction());
-	float b = 2.0f * dot(oc, r.direction());
-	float c = dot(oc, oc) - radius*radius;
-	float discriminant = b*b - 4 * a*c;
-	return (discriminant > 0);
-}
 
-vec3 color(const ray& r)
+vec3 color(const ray& r, hitable *world)
 {
-	if (hit_sphere(vec3(0,0,-1), 0.5f, r))
+	hit_record rec;
+	if (world->hit(r, 0.0, FLT_MAX, rec))
 	{
-		return vec3(1, 0, 0);
+		return 0.5*vec3(rec.normal.x() + 1, rec.normal.y() + 1, rec.normal.z() + 1);
 	}
+
 	vec3 unit_direction = unit_vector(r.direction());
 	float t = 0.5f*(unit_direction.y() + 1.0f);
 	return (1.0f - t)*vec3(1.0f, 1.0f, 1.0f) + t*vec3(0.5f, 0.7f, 1.0f);
@@ -45,7 +42,11 @@ int main()
 	vec3 vertical(0.0f, 2.0f, 0.0f);
 	vec3 origin(0.0f, 0.0f, 0.0f);
 
+	hitable *list[2];
 
+	list[0] = new sphere(vec3(0, 0, -1), 0.5);
+	list[1] = new sphere(vec3(0, -100.5, -1), 100);
+	hitable *world = new hitable_list(list, 2);
 
 	for (int row = 0; row < height; row++)
 	{
@@ -56,8 +57,7 @@ int main()
 			float v = float(height - row) / float(height);
 
 			ray r(origin, lower_left_corner + u*horizontal + v*vertical);
-
-			vec3 col = color(r);
+			vec3 col = color(r, world);
 
 			uint8_t ir = static_cast<uint8_t>(255.99f * col.r());
 			uint8_t ig = static_cast<uint8_t>(255.99f * col.g());
