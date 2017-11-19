@@ -9,31 +9,45 @@
 #include "stb_image_write.h"
 #include "vec3.h"
 #include <fstream>
+#include "ray.h"
+
+vec3 color(const ray& r)
+{
+	vec3 unit_direction = unit_vector(r.direction());
+	float t = 0.5f*(unit_direction.y() + 1.0f);
+	return (1.0f - t)*vec3(1.0f, 1.0f, 1.0f) + t*vec3(0.5f, 0.7f, 1.0f);
+}
 
 int main()
 {
-	int width = 640;
-	int height = 480;
+	int width = 200;
+	int height = 100;
 
 
 	std::vector<uint8_t> image;
 
+	vec3 lower_left_corner(-2.0f, -1.0f, -1.0f);
+	vec3 horizontal(4.0f, 0.0f, 0.0f);
+	vec3 vertical(0.0f, 2.0f, 0.0f);
+	vec3 origin(0.0f, 0.0f, 0.0f);
+
+
 
 	for (int row = 0; row < height; row++)
 	{
-		for (int col = 0;col < width; col++)
+		for (int column = 0;column < width; column++)
 		{
 
-			vec3 color(
-				float(col) / float(width),
-				float(height - row) / float(height),
-				0.2f
+			float u = float(column) / float(width);
+			float v = float(height - row) / float(height);
 
-			);
+			ray r(origin, lower_left_corner + u*horizontal + v*vertical);
 
-			uint8_t ir = static_cast<uint8_t>(255.99 * color.r());
-			uint8_t ig = static_cast<uint8_t>(255.99 * color.g());
-			uint8_t ib = static_cast<uint8_t>(255.99 * color.b());
+			vec3 col = color(r);
+
+			uint8_t ir = static_cast<uint8_t>(255.99f * col.r());
+			uint8_t ig = static_cast<uint8_t>(255.99f * col.g());
+			uint8_t ib = static_cast<uint8_t>(255.99f * col.b());
 			image.push_back(ir);
 			image.push_back(ig);
 			image.push_back(ib);
